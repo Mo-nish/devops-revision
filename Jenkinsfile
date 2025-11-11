@@ -27,7 +27,9 @@ pipeline {
                             sonar-scanner ^
                                 -Dsonar.projectKey=devops-revision ^
                                 -Dsonar.sources=. ^
-                                -Dsonar.java.binaries=.
+                                -Dsonar.java.binaries=. ^
+                                -Dsonar.host.url=http://localhost:9000 ^
+                                -Dsonar.login=sqp_ce843eb188f32ba09cc211ec1c47f0d7929cea19
                         """
                     }
                 }
