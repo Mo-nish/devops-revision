@@ -6,8 +6,8 @@ pipeline {
     }
 
     environment {
-        SONARQUBE = 'devops-revision'     // must match Jenkins config
-        DOCKER_IMAGE = 'devops-revision'
+        SONARQUBE = 'Dev'     // must match Jenkins config
+        DOCKER_IMAGE = 'Dev'
         DOCKER_TAG = "v${BUILD_NUMBER}"
         NEXUS_REPO = 'localhost:8082/devops-docker' // your Nexus Docker repo (no http://)
     }
