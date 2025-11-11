@@ -27,7 +27,7 @@ pipeline {
                     withSonarQubeEnv("${SONARQUBE}") {
                         bat """
                             "${scannerHome}\\bin\\sonar-scanner.bat" ^
-                                -Dsonar.projectKey=devops-revision ^
+                                -Dsonar.projectKey=Dev ^
                                 -Dsonar.sources=. ^
                                 -Dsonar.java.binaries=. ^
                                 -Dsonar.host.url=http://localhost:9000
