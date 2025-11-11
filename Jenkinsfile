@@ -9,7 +9,7 @@ pipeline {
         SONARQUBE = 'SonarQube'
         DOCKER_IMAGE = 'devops-revision'
         DOCKER_TAG = "v${BUILD_NUMBER}"
-        NEXUS_REPO = 'http://your-nexus-repo-url'
+        NEXUS_REPO = 'http://localhost:8081/'
     }
 
     stages {
