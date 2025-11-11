@@ -9,7 +9,7 @@ pipeline {
         SONARQUBE = 'SonarQube'
         DOCKER_IMAGE = 'devops-revision'
         DOCKER_TAG = "v${BUILD_NUMBER}"
-        NEXUS_REPO = 'nexus-repo-url'
+        NEXUS_REPO = 'http://your-nexus-repo-url'
     }
 
     stages {
@@ -22,8 +22,13 @@ pipeline {
         stage('Code Quality - SonarQube Scan') {
             steps {
                 script {
-                    withSonarQubeEnv('SonarQube') {
-                        bat "sonar-scanner -Dsonar.projectKey=devops-revision -Dsonar.sources=."
+                    withSonarQubeEnv("${SONARQUBE}") {
+                        bat """
+                            sonar-scanner ^
+                                -Dsonar.projectKey=devops-revision ^
+                                -Dsonar.sources=. ^
+                                -Dsonar.java.binaries=.
+                        """
                     }
                 }
             }
@@ -40,18 +45,21 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% ."
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
                 }
             }
         }
 
         stage('Push Docker Image to Nexus') {
             steps {
-                script {
-                    // Replace with your Nexus Docker repo login
-                    bat "docker login -u <username> -p <password> <nexus-url>"
-                    bat "docker tag %DOCKER_IMAGE%:%DOCKER_TAG% <nexus-url>/%DOCKER_IMAGE%:%DOCKER_TAG%"
-                    bat "docker push <nexus-url>/%DOCKER_IMAGE%:%DOCKER_TAG%"
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                    script {
+                        bat """
+                            docker login -u ${NEXUS_USER} -p ${NEXUS_PASS} ${NEXUS_REPO}
+                            docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${NEXUS_REPO}/${DOCKER_IMAGE}:${DOCKER_TAG}
+                            docker push ${NEXUS_REPO}/${DOCKER_IMAGE}:${DOCKER_TAG}
+                        """
+                    }
                 }
             }
         }
