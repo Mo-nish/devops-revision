@@ -6,10 +6,10 @@ pipeline {
     }
 
     environment {
-        SONARQUBE = 'SonarQube'
+        SONARQUBE = 'devops-revision'     // must match Jenkins config
         DOCKER_IMAGE = 'devops-revision'
         DOCKER_TAG = "v${BUILD_NUMBER}"
-        NEXUS_REPO = 'http://localhost:8081/'
+        NEXUS_REPO = 'localhost:8082/devops-docker' // your Nexus Docker repo (no http://)
     }
 
     stages {
@@ -22,14 +22,15 @@ pipeline {
         stage('Code Quality - SonarQube Scan') {
             steps {
                 script {
+                    // use the configured SonarQube server and scanner tool
+                    def scannerHome = tool 'sonar-scanner'
                     withSonarQubeEnv("${SONARQUBE}") {
                         bat """
-                            sonar-scanner ^
+                            "${scannerHome}\\bin\\sonar-scanner.bat" ^
                                 -Dsonar.projectKey=devops-revision ^
                                 -Dsonar.sources=. ^
                                 -Dsonar.java.binaries=. ^
-                                -Dsonar.host.url=http://localhost:9000 ^
-                                -Dsonar.login=sqp_ce843eb188f32ba09cc211ec1c47f0d7929cea19
+                                -Dsonar.host.url=http://localhost:9000
                         """
                     }
                 }
@@ -38,7 +39,7 @@ pipeline {
 
         stage('Quality Gate Check') {
             steps {
-                timeout(time: 1, unit: 'HOURS') {
+                timeout(time: 10, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
